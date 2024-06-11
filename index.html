@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Battery Life Calculator</title>
+    <title>Electrical Converter</title>
     <style>
-        /* styles.css */
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -74,7 +73,7 @@
             margin: 0;
         }
 
-        #batteryLife {
+        #vaResult, #ampsResult, #voltsResult, #powerFactorResult {
             font-weight: bold;
         }
     </style>
@@ -82,46 +81,54 @@
 
 <body>
     <div class="container">
-        <h1>Calculateur de Durée de Fonctionnement d'une Batterie</h1>
-        <form id="batteryForm">
+        <h1>Convertisseur Électrique</h1>
+        <form id="converterForm">
             <div class="input-group">
-                <label for="batteryCapacity">Capacité de la Batterie (Ah) :</label>
-                <input type="number" id="batteryCapacity" name="batteryCapacity" step="0.1" required>
+                <label for="watts">Puissance (Watts) :</label>
+                <input type="number" id="watts" name="watts" step="0.1" required>
             </div>
             <div class="input-group">
-                <label for="currentDraw">Consommation de Courant (A) :</label>
-                <input type="number" id="currentDraw" name="currentDraw" step="0.1" required>
+                <label for="voltage">Tension (Volts) :</label>
+                <input type="number" id="voltage" name="voltage" step="0.1" required>
             </div>
-            <button type="button" onclick="calculateBatteryLife()">Calculer</button>
+            <div class="input-group">
+                <label for="powerFactor">Facteur de Puissance (0-1) :</label>
+                <input type="number" id="powerFactor" name="powerFactor" step="0.01" required>
+            </div>
+            <button type="button" onclick="convertValues()">Convertir</button>
         </form>
         <div id="result">
-            <p>La durée de fonctionnement estimée est de : <span id="batteryLife">0</span> heures</p>
+            <p>Volt-Ampères (VA) : <span id="vaResult">0</span></p>
+            <p>Courant (Amps) : <span id="ampsResult">0</span></p>
+            <p>Tension (Volts) : <span id="voltsResult">0</span></p>
+            <p>Facteur de Puissance : <span id="powerFactorResult">0</span></p>
         </div>
     </div>
     <script>
-        function calculateBatteryLife() {
-            const batteryCapacity = parseFloat(document.getElementById('batteryCapacity').value);
-            const currentDraw = parseFloat(document.getElementById('currentDraw').value);
+        function convertValues() {
+            const watts = parseFloat(document.getElementById('watts').value);
+            const voltage = parseFloat(document.getElementById('voltage').value);
+            const powerFactor = parseFloat(document.getElementById('powerFactor').value);
 
-            if (isNaN(batteryCapacity) || isNaN(currentDraw)) {
+            if (isNaN(watts) || isNaN(voltage) || isNaN(powerFactor)) {
                 alert('Veuillez entrer des nombres valides.');
                 return;
             }
 
-            if (currentDraw <= 0) {
-                alert('La consommation de courant doit être supérieure à zéro.');
+            if (powerFactor <= 0 || powerFactor > 1) {
+                alert('Le facteur de puissance doit être compris entre 0 et 1.');
                 return;
             }
 
-            // Calcul de la durée de fonctionnement
-            let batteryLife = batteryCapacity / currentDraw;
+            // Calculations
+            const va = watts / powerFactor;
+            const amps = watts / (voltage * powerFactor);
 
-            // Arrondir à la fraction la plus proche (0, 0.25, 0.5, 0.75)
-            const quarterHour = 0.25;
-            batteryLife = Math.round(batteryLife / quarterHour) * quarterHour;
-
-            // Affichage du résultat
-            document.getElementById('batteryLife').innerText = batteryLife.toFixed(2);
+            // Display results
+            document.getElementById('vaResult').innerText = va.toFixed(2);
+            document.getElementById('ampsResult').innerText = amps.toFixed(2);
+            document.getElementById('voltsResult').innerText = voltage.toFixed(2);
+            document.getElementById('powerFactorResult').innerText = powerFactor.toFixed(2);
         }
     </script>
 </body>
